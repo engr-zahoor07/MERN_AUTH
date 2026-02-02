@@ -206,47 +206,52 @@ const login = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const { id } = req.decodedData;
-    const { type } = req.body;
-    // console.log(id);
-    // console.log(type);
-    // console.log(req.decodedData);
+    const { type, newUserData } = req.body;
+
     const user = await UserModel.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let subject = "";
+    let emailBody = "";
+
     switch (type) {
-      case "username": {
-        user.username = req.body.newUserData.username;
-        await user.save();
-        const emailBody = `<p>Username Updated Successfully</p>`;
-        const subject = `Username Updated`;
-        await sendEmail(user.email, subject, emailBody);
+      case "username":
+        user.username = newUserData.username;
+        subject = "Username Updated";
+        emailBody = "<p>Username Updated Successfully</p>";
         break;
-      }
-      case "email": {
-        user.email = req.body.newUserData.email;
-        await user.save();
-        const emailBody = `<p>Email Updated Successfully</p>`;
-        const subject = `Email Updated`;
-        await sendEmail(user.email, subject, emailBody);
+
+      case "email":
+        user.email = newUserData.email;
+        subject = "Email Updated";
+        emailBody = "<p>Email Updated Successfully</p>";
         break;
-      }
-      case "password": {
-        const hashpassword = await bcrypt.hash(
-          req.body.newUserData.password,
-          10,
-        );
-        user.password = hashpassword;
-        await user.save();
-        const emailBody = `<p>Password Updated Successfully</p>`;
-        const subject = `Password Updated`;
-        await sendEmail(user.email, subject, emailBody);
+
+      case "password":
+        user.password = await bcrypt.hash(newUserData.password, 10);
+        subject = "Password Updated";
+        emailBody = "<p>Password Updated Successfully</p>";
         break;
-      }
+
       default:
         return res.status(400).json({ message: "Invalid update type" });
     }
-    res.json({ message: `${type} Updated Successfully.` });
-    console.log(user);
+
+    await user.save();
+
+    // 🟡 Email should NOT break the API
+    try {
+      await sendEmail(user.email, subject, emailBody);
+    } catch (emailError) {
+      console.error("EMAIL FAILED:", emailError.message);
+    }
+
+    res.json({ message: `${type} updated successfully` });
   } catch (error) {
-    res.json({ message: "Something went Wrong!" });
+    console.error("UPDATE ERROR:", error);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };
 
