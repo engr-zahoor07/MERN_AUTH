@@ -123,7 +123,7 @@ const Login = () => {
           <div>
             <FacebookLoginButton></FacebookLoginButton>
           </div>
-          <div onClick={handleContinueWithGoogle}>
+          <div onClick={() => handleContinueWithGoogle()}>
             <GoogleLoginButton></GoogleLoginButton>
           </div>
         </div>
