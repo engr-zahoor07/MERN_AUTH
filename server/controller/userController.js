@@ -273,6 +273,7 @@ const forgotPassword = async (req, res) => {
       const subject = `Password Reset Successfully`;
       await sendEmail(isUserExisting.email, subject, emailBody);
       res.status(200).json({ message: "Password Reset Successfully." });
+      return;
     }
     //verification token is generated
     const verificationToken = otp_generator.generate(6, {
