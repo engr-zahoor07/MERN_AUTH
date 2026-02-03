@@ -44,7 +44,7 @@ const register = async (req, res) => {
     console.log(newUser);
     await newUser.save();
 
-    const emailBody = `<p>Please Click on the link to Verify Your Account. <b>http://localhost:3000/user/verify/${verificationToken}</b></p>`;
+    const emailBody = `<p>Please Click on the link to Verify Your Account. <b>https://mern-auth-drtd.onrender.com/user/verify/${verificationToken}</b></p>`;
     const subject = "Verification Email";
 
     await sendEmail(req.body.email, subject, emailBody);
@@ -70,7 +70,7 @@ const verifyUser = async (req, res) => {
       return res
         .status(400)
         .send(
-          `<p>Token Invalid or Expires</p> <a href="http://localhost:3000/user/resndVerification/${token}">Resend Verification Mail</a>`,
+          `<p>Token Invalid or Expires</p> <a href="https://mern-auth-drtd.onrender.com/user/resndVerification/${token}">Resend Verification Mail</a>`,
         );
     }
     if (isTokenValid.isVerified) {
@@ -110,7 +110,7 @@ const resndVerification = async (req, res) => {
     };
     await user.save();
 
-    const emailBody = `<p>Please Click on the link to Verify Your Account. <b>http://localhost:3000/user/verify/${newVerificationToken}</b></p>`;
+    const emailBody = `<p>Please Click on the link to Verify Your Account. <b>https://mern-auth-drtd.onrender.com/user/verify/${newVerificationToken}</b></p>`;
     const subject = "Verification Email";
 
     await sendEmail(user.email, subject, emailBody);
